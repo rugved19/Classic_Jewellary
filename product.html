@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classic Jewellery</title>
+    <link rel="stylesheet" href="styles.css"> 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>  
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+    <style>
+        .cart-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 50px;
+        }
+       
+        .fixed-top {
+            padding: 10px;
+            z-index: 1000;
+        }
+
+        .navbar-nav li a {
+            text-decoration: none !important;
+            color: white !important;
+            padding: 10px 15px;
+            font-weight: 600;
+        }
+    
+        .navbar-nav li a:hover {
+            color: bisque !important;
+        }
+
+        .nav-item .btn {
+            margin-left: 15px;
+        }
+
+        #navbar {
+            background-color: rgba(0, 0, 0, 0.8);
+            transition: background-color 0.3s ease-in-out, padding 0.3s ease-in-out;
+            padding: 15px 0;
+        }
+
+        .scrolled {
+            background-color: black !important;
+            padding: 10px 0;
+        }
+
+        .nav-link {
+            font-size: 16px;
+            font-weight: 500;
+            padding: 10px 15px;
+        }
+
+        .card-img-top {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .card-img-top {
+                height: 200px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card-img-top {
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header class="default-header">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="navbar">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a class="navbar-brand" href="index.html">
+                <h4 style="color: bisque;">Classic Jewellery</h4>
+            </a>
+
+            <!-- Cart Icon (Mobile) -->
+            <a href="cart.html" class="btn btn-warning d-lg-none">
+                🛒 <span class="cart-count" style="color: black;">0</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="text-white lnr lnr-menu"></span>
+            </button>
+
+            <div class="collapse navbar-collapse justify-content-end align-items-center" id="navbarSupportedContent">
+                <ul class="navbar-nav">
+                    <li><a href="main.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="product.html">Product</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="order-history.html">Order History</a></li>
+
+                    <!-- Cart Icon (Desktop) -->
+                    <li class="nav-item d-none d-lg-block">
+                        <a href="cart.html" class="btn btn-warning">
+                            🛒 <span class="cart-count" style="color: black;">0</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<div style="margin-top: 80px;"></div>
+
+<section class="container my-5">
+    <h2 class="text-center mb-4">Explore Our Exquisite Jewelry Collection</h2>
+    <p class="text-center mb-5">Discover the finest craftsmanship in gold, silver, diamond, and platinum jewelry.</p>
+    
+    <div class="row" id="productList">
+        <div class="col-lg-4 col-md-6 mb-4 product-item" data-name="diamond necklace">
+            <div class="card">
+                <img src="./img/p-diamond-1.jpg" class="card-img-top" alt="Diamond Necklace">
+                <div class="card-body">
+                    <h5 class="card-title">Royal Diamond Necklace</h5>
+                    <p class="card-text">A stunning diamond necklace that adds elegance and charm to any outfit.</p>
+                    <p class="price">Rs 1200</p>
+                    <button class="btn btn-primary add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-4 product-item" data-name="ruby bangle">
+            <div class="card">
+                <img src="./img/p-Bangles-2.jpg" class="card-img-top" alt="Ruby Bangle">
+                <div class="card-body">
+                    <h5 class="card-title">Ruby Encrusted Bangle</h5>
+                    <p class="card-text">A magnificent bangle featuring exquisite ruby stones, perfect for special occasions.</p>
+                    <p class="price">Rs 2500</p>
+                    <button class="btn btn-primary add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-4 product-item" data-name="gold necklace">
+            <div class="card">
+                <img src="./img/p-ranihar-3.jpg" class="card-img-top" alt="Gold Necklace">
+                <div class="card-body">
+                    <h5 class="card-title">Swarna Rani Haar</h5>
+                    <p class="card-text">A luxurious gold necklace inspired by traditional royal jewelry, perfect for grand occasions.</p>
+                    <p class="price">Rs 2500</p>
+                    <button class="btn btn-primary add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-4 product-item" data-name="silver ring">
+            <div class="card">
+                <img src="./img/p-ring-4.jpg" class="card-img-top" alt="Silver Ring">
+                <div class="card-body">
+                    <h5 class="card-title">Heer Sitara Ring</h5>
+                    <p class="card-text">A delicate silver ring with a sparkling stone, bringing a touch of elegance to any look.</p>
+                    <p class="price">Rs 800</p>
+                    <button class="btn btn-primary add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- More Products -->
+        <div class="col-lg-4 col-md-6 mb-4 product-item" data-name="silver anklet">
+            <div class="card">
+                <img src="./img/p-payal-5.jpg" class="card-img-top" alt="Silver Anklet">
+                <div class="card-body">
+                    <h5 class="card-title">Chandi Payal</h5>
+                    <p class="card-text">An intricately designed silver anklet with tiny bells, adding charm to your steps.</p>
+                    <p class="price">Rs 1500</p>
+                    <button class="btn btn-primary add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-4 product-item" data-name="pearl pendant">
+            <div class="card">
+                <img src="./img/p-perl-6.jpg" class="card-img-top" alt="Pearl Pendant">
+                <div class="card-body">
+                    <h5 class="card-title">Pearl Pendant Necklace</h5>
+                    <p class="card-text">A classic pearl pendant set on a delicate silver chain, exuding timeless elegance.</p>
+                    <p class="price">Rs 1100</p>
+                    <button class="btn btn-primary add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-4 product-item" data-name="platinum armlet">
+            <div class="card">
+                <img src="./img/p-platinum-7.jpg" class="card-img-top" alt="Platinum Armlet">
+                <div class="card-body">
+                    <h5 class="card-title">Platina Vanki</h5>
+                    <p class="card-text">A unique platinum armlet with intricate carvings, blending tradition with modern elegance.</p>
+                    <p class="price">Rs 2500</p>
+                    <button class="btn btn-primary add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-4 product-item" data-name="gold jhumka">
+            <div class="card">
+                <img src="./img/p-zhumka-8.jpg" class="card-img-top" alt="Gold Jhumka">
+                <div class="card-body">
+                    <h5 class="card-title">Suhana Jhumka</h5>
+                    <p class="card-text">Traditional gold jhumkas with intricate patterns, ideal for festive occasions.</p>
+                    <p class="price">Rs 1800</p>
+                    <button class="btn btn-primary add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-4 product-item" data-name="diamond bracelet">
+            <div class="card">
+                <img src="./img/p-bracelete-9.jpg" class="card-img-top" alt="Diamond Bracelet">
+                <div class="card-body">
+                    <h5 class="card-title">Diamond Tennis Bracelet</h5>
+                    <p class="card-text">A stunning diamond bracelet featuring a row of sparkling diamonds in a sleek design.</p>
+                    <p class="price">Rs 3500</p>
+                    <button class="btn btn-primary add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<script>
+    $(document).ready(function () {
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+        function updateCartCount() {
+            $(".cart-count").text(cart.length); // Updates all cart count elements
+        }
+
+        updateCartCount(); // Initial update on page load
+
+        $(".add-to-cart").on("click", function () {
+            let product = $(this).siblings(".card-title").text();
+            let price = parseFloat($(this).siblings(".price").text().replace("Rs", "").trim());
+
+            cart.push({ name: product, price: price });
+            localStorage.setItem("cart", JSON.stringify(cart));
+
+            updateCartCount();
+            // alert(`${product} added to cart!`);
+        });
+
+        window.addEventListener("scroll", function () {
+            let navbar = document.getElementById("navbar");
+            if (window.scrollY > 50) {
+                navbar.classList.add("scrolled");
+            } else {
+                navbar.classList.remove("scrolled");
+            }
+        });
+
+        $("#logoutBtn").on("click", function () {
+            localStorage.removeItem("currentUser");
+            window.location.href = "index.html";
+        });
+    });
+</script>
+
+</body>
+</html>
