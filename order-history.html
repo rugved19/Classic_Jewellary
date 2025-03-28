@@ -4,15 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order History</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .order-address {
+            background: #eef4ff;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .delete-order {
+            font-size: 12px;
+        }
+    </style>
 </head>
 <body>
 
 <!-- Order History Section -->
 <div class="container mt-5">
-    <h2>📜 Order History</h2>
+    <h2 class="mb-3">📜 Order History</h2>
     <p id="userInfo" class="text-muted"></p>
     <ul id="orderHistory" class="list-group"></ul>
 
@@ -22,17 +39,18 @@
 
 <script>
     $(document).ready(function () {
-        let userName = localStorage.getItem("currentUser"); // Get last used username
+        let userName = localStorage.getItem("currentUser"); // Get logged-in user
         let orderHistory = $("#orderHistory");
         let userInfo = $("#userInfo");
 
         if (!userName) {
-            userInfo.text("⚠ No user found. Please place an order first.");
+            userInfo.text("⚠ No user found. Please log in first.");
             orderHistory.append("<li class='list-group-item text-center'>No orders found.</li>");
             return;
         }
 
         let orders = JSON.parse(localStorage.getItem(`orders_${userName}`)) || [];
+        let userAddress = JSON.parse(localStorage.getItem(`address_${userName}`)); // Fetch specific user address
 
         userInfo.html(`Showing order history for: <strong>${userName}</strong>`);
 
@@ -42,25 +60,32 @@
             if (orders.length === 0) {
                 orderHistory.append("<li class='list-group-item text-center'>No orders yet.</li>");
             } else {
-                orders.forEach((order, index) => {
+                orders.slice().reverse().forEach((order, index) => {  // Reverse order to show latest first
                     let items = order.items.map(item => `${item.name} - ₹${item.price}`).join("<br>");
-                    
-                    // Calculate total price for the order
                     let totalAmount = order.items.reduce((sum, item) => sum + item.price, 0);
 
-                    // Show payment method (Online or COD)
                     let paymentInfo = order.paymentMethod === "razorpay" 
                         ? `✅ <strong>Online Payment (Razorpay)</strong> <br> Payment ID: ${order.paymentDetails}`
                         : `💰 <strong>Cash on Delivery (COD)</strong>`;
 
+                    let addressHTML = userAddress
+                        ? `<div class="order-address">
+                            <strong>Delivery Address:</strong><br>
+                            🏠 ${userAddress.flat}, ${userAddress.area} <br>
+                            📍 ${userAddress.landmark || "No landmark"} <br>
+                            📞 ${userAddress.mobile}
+                           </div>`
+                        : `<div class="text-danger">❌ Address Not Found</div>`;
+
                     orderHistory.append(`
-                        <li class="list-group-item mb-4">
-                            <strong>Order #${index + 1} (${order.date})</strong><br>
-                            ${items}
+                        <li class="list-group-item mb-4 card p-3">
+                            <h5>Order #${orders.length - index} (${order.date})</h5>
+                            <p>${items}</p>
                             <hr>
                             <strong>Total: ₹${totalAmount}</strong><br>
                             ${paymentInfo}
-                            <button class="btn btn-danger btn-sm float-end delete-order" data-index="${index}">🗑 Delete</button>
+                            ${addressHTML}
+                            <button class="btn btn-danger btn-sm float-end delete-order mt-2" data-index="${orders.length - index - 1}">🗑 Delete</button>
                         </li>
                     `);
                 });

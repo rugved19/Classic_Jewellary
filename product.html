@@ -74,6 +74,57 @@
                 height: 150px;
             }
         }
+
+        .card {
+    border-radius: 15px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.card-img-top {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+}
+
+.card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+.overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease;
+}
+
+.card:hover .overlay {
+    opacity: 1;
+}
+
+.overlay .btn {
+    background: rgba(255, 255, 255, 0.8);
+    color: black;
+    font-weight: bold;
+    border-radius: 25px;
+    padding: 10px 20px;
+}
+
     </style>
 </head>
 <body>
@@ -128,7 +179,7 @@
                 <div class="card-body">
                     <h5 class="card-title">Royal Diamond Necklace</h5>
                     <p class="card-text">A stunning diamond necklace that adds elegance and charm to any outfit.</p>
-                    <p class="price">Rs 1200</p>
+                    <p class="price">Rs 1200/-</p>
                     <button class="btn btn-primary add-to-cart">Add to Cart</button>
                 </div>
             </div>
@@ -140,7 +191,7 @@
                 <div class="card-body">
                     <h5 class="card-title">Ruby Encrusted Bangle</h5>
                     <p class="card-text">A magnificent bangle featuring exquisite ruby stones, perfect for special occasions.</p>
-                    <p class="price">Rs 2500</p>
+                    <p class="price">Rs 2500/-</p>
                     <button class="btn btn-primary add-to-cart">Add to Cart</button>
                 </div>
             </div>
@@ -152,7 +203,7 @@
                 <div class="card-body">
                     <h5 class="card-title">Swarna Rani Haar</h5>
                     <p class="card-text">A luxurious gold necklace inspired by traditional royal jewelry, perfect for grand occasions.</p>
-                    <p class="price">Rs 2500</p>
+                    <p class="price">Rs 2500/-</p>
                     <button class="btn btn-primary add-to-cart">Add to Cart</button>
                 </div>
             </div>
@@ -164,7 +215,7 @@
                 <div class="card-body">
                     <h5 class="card-title">Heer Sitara Ring</h5>
                     <p class="card-text">A delicate silver ring with a sparkling stone, bringing a touch of elegance to any look.</p>
-                    <p class="price">Rs 800</p>
+                    <p class="price">Rs 800/-</p>
                     <button class="btn btn-primary add-to-cart">Add to Cart</button>
                 </div>
             </div>
@@ -177,7 +228,7 @@
                 <div class="card-body">
                     <h5 class="card-title">Chandi Payal</h5>
                     <p class="card-text">An intricately designed silver anklet with tiny bells, adding charm to your steps.</p>
-                    <p class="price">Rs 1500</p>
+                    <p class="price">Rs 1500/-</p>
                     <button class="btn btn-primary add-to-cart">Add to Cart</button>
                 </div>
             </div>
@@ -189,7 +240,7 @@
                 <div class="card-body">
                     <h5 class="card-title">Pearl Pendant Necklace</h5>
                     <p class="card-text">A classic pearl pendant set on a delicate silver chain, exuding timeless elegance.</p>
-                    <p class="price">Rs 1100</p>
+                    <p class="price">Rs 1100/-</p>
                     <button class="btn btn-primary add-to-cart">Add to Cart</button>
                 </div>
             </div>
@@ -201,7 +252,7 @@
                 <div class="card-body">
                     <h5 class="card-title">Platina Vanki</h5>
                     <p class="card-text">A unique platinum armlet with intricate carvings, blending tradition with modern elegance.</p>
-                    <p class="price">Rs 2500</p>
+                    <p class="price">Rs 2500/-</p>
                     <button class="btn btn-primary add-to-cart">Add to Cart</button>
                 </div>
             </div>
@@ -213,7 +264,7 @@
                 <div class="card-body">
                     <h5 class="card-title">Suhana Jhumka</h5>
                     <p class="card-text">Traditional gold jhumkas with intricate patterns, ideal for festive occasions.</p>
-                    <p class="price">Rs 1800</p>
+                    <p class="price">Rs 1800/-</p>
                     <button class="btn btn-primary add-to-cart">Add to Cart</button>
                 </div>
             </div>
@@ -225,7 +276,7 @@
                 <div class="card-body">
                     <h5 class="card-title">Diamond Tennis Bracelet</h5>
                     <p class="card-text">A stunning diamond bracelet featuring a row of sparkling diamonds in a sleek design.</p>
-                    <p class="price">Rs 3500</p>
+                    <p class="price">Rs 3500/-</p>
                     <button class="btn btn-primary add-to-cart">Add to Cart</button>
                 </div>
             </div>
