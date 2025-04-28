@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Manage Orders</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #1f4037, #99f2c8);
+      display: flex;
+      height: 100vh;
+      color: #fff;
+    }
+
+    .sidebar {
+      width: 220px;
+      background-color: rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar h3 {
+      margin-bottom: 40px;
+      font-size: 22px;
+      font-weight: 600;
+      color: #fff;
+      text-align: center;
+    }
+
+    .sidebar button {
+      background: none;
+      border: none;
+      color: #fff;
+      text-align: left;
+      font-size: 16px;
+      margin-bottom: 20px;
+      padding: 10px 15px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .sidebar button:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar button i {
+      margin-right: 10px;
+      font-size: 18px;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 50px;
+      overflow-y: auto;
+    }
+
+    .badge-status {
+      font-size: 0.9rem;
+      padding: 5px 10px;
+    }
+
+    .search-box {
+      max-width: 400px;
+      margin-bottom: 20px;
+    }
+
+    .table td, .table th {
+      vertical-align: middle;
+      color: #1f4037;
+    }
+
+    .table thead {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .table {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .btn-sm {
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        flex-direction: row;
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        justify-content: space-around;
+      }
+
+      .sidebar h3 {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <h3>Admin Panel</h3>
+    <button onclick="goTo('admin-dashboard.html')"><i class="bi bi-house"></i> Dashboard</button>
+    <button onclick="goTo('admin-products.html')"><i class="bi bi-box-seam"></i> Products</button>
+    <button onclick="goTo('admin-orders.html')"><i class="bi bi-receipt"></i> Orders</button>
+    <button onclick="goTo('admin-user.html')"><i class="bi bi-people"></i> Users</button>
+    <button onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</button>
+  </div>
+
+  <div class="main-content">
+    <h2 class="mb-4">Customer Orders</h2>
+
+    <div class="search-box">
+      <input type="text" id="searchInput" class="form-control" placeholder="Search by customer name..." oninput="displayOrders()">
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover align-middle">
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th>Address</th>
+            <th>Products</th>
+            <th>Total</th>
+            <th>Payment</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="orderTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    if (localStorage.getItem("adminLoggedIn") !== "true") {
+      window.location.href = "admin-login.html";
+    }
+
+    function goTo(page) {
+      window.location.href = page;
+    }
+
+    function logout() {
+      localStorage.removeItem("adminLoggedIn");
+      window.location.href = "login.html";
+    }
+
+    function getAllOrdersFromLocalStorage() {
+      let allOrders = [];
+
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith("orders_")) {
+          const username = key.replace("orders_", "");
+          const userOrders = JSON.parse(localStorage.getItem(key)) || [];
+
+          userOrders.forEach((order, orderIndex) => {
+            allOrders.push({
+              username,
+              orderIndex,
+              items: order.items,
+              date: order.date,
+              paymentMethod: order.paymentMethod || "Unknown",
+              paymentDetails: order.paymentDetails || "",
+              status: order.status || "Pending",
+              address: JSON.parse(localStorage.getItem(`address_${username}`)) || {},
+            });
+          });
+        }
+      }
+
+      return allOrders;
+    }
+
+    function displayOrders() {
+      const searchValue = document.getElementById("searchInput").value.toLowerCase();
+      const tbody = document.getElementById("orderTableBody");
+      tbody.innerHTML = "";
+
+      const orders = getAllOrdersFromLocalStorage().filter(order =>
+        order.username.toLowerCase().includes(searchValue)
+      );
+
+      if (orders.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center text-white">No orders found</td></tr>`;
+        return;
+      }
+
+      orders.reverse().forEach((order) => {
+        const row = document.createElement("tr");
+
+        const itemsHTML = order.items.map(item =>
+          `<li>${item.name} - ₹${item.price}</li>`
+        ).join(" ");
+
+        const total = order.items.reduce((sum, item) => sum + item.price, 0);
+
+        const address = order.address.flat
+          ? `${order.address.flat}, ${order.address.area}, ${order.address.landmark || ""}<br><small>📞 ${order.address.mobile}</small>`
+          : "<span class='text-danger'>Address not found</span>";
+
+        let statusBadge = "";
+        if (order.status === "Completed") {
+          statusBadge = `<span class="badge bg-success badge-status">Completed</span>`;
+        } else if (order.status === "Shipped") {
+          statusBadge = `<span class="badge bg-primary text-white badge-status">Shipped</span>`;
+        } else {
+          statusBadge = `<span class="badge bg-warning text-dark badge-status">Pending</span>`;
+        }
+
+        const paymentBadge = `<span class="badge bg-info text-dark badge-status">${order.paymentMethod}</span>`;
+
+        row.innerHTML = `
+          <td>${order.username}</td>
+          <td>${address}</td>
+          <td><ul class="mb-0">${itemsHTML}</ul></td>
+          <td><strong>₹${total}</strong></td>
+          <td>${paymentBadge}</td>
+          <td>${statusBadge}</td>
+          <td>
+            <button class="btn btn-sm btn-success mb-1" onclick="markCompleted('${order.username}', ${order.orderIndex})">
+              <i class="bi bi-check-circle"></i>
+            </button>
+            <button class="btn btn-sm btn-primary mb-1" onclick="markShipped('${order.username}', ${order.orderIndex})">
+              <i class="bi bi-truck"></i>
+            </button>
+            <button class="btn btn-sm btn-danger" onclick="deleteOrder('${order.username}', ${order.orderIndex})">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        `;
+
+        tbody.appendChild(row);
+      });
+    }
+
+    function markCompleted(username, orderIndex) {
+      const key = `orders_${username}`;
+      let orders = JSON.parse(localStorage.getItem(key)) || [];
+
+      if (orders[orderIndex]) {
+        orders[orderIndex].status = "Completed";
+        localStorage.setItem(key, JSON.stringify(orders));
+        displayOrders();
+      }
+    }
+
+    function markShipped(username, orderIndex) {
+      const key = `orders_${username}`;
+      let orders = JSON.parse(localStorage.getItem(key)) || [];
+
+      if (orders[orderIndex]) {
+        orders[orderIndex].status = "Shipped";
+        localStorage.setItem(key, JSON.stringify(orders));
+        displayOrders();
+      }
+    }
+
+    function deleteOrder(username, orderIndex) {
+      if (confirm(`Are you sure you want to delete this order from ${username}?`)) {
+        const key = `orders_${username}`;
+        let orders = JSON.parse(localStorage.getItem(key)) || [];
+        orders.splice(orderIndex, 1);
+        localStorage.setItem(key, JSON.stringify(orders));
+        displayOrders();
+      }
+    }
+
+    displayOrders();
+  </script>
+</body>
+</html>

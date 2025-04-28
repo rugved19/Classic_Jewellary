@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin - Manage Products</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #1f4037, #99f2c8);
+      display: flex;
+      height: 100vh;
+      color: #fff;
+    }
+
+    .sidebar {
+      width: 220px;
+      background-color: rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar h3 {
+      margin-bottom: 40px;
+      font-size: 22px;
+      font-weight: 600;
+      color: #fff;
+      text-align: center;
+    }
+
+    .sidebar button {
+      background: none;
+      border: none;
+      color: #fff;
+      text-align: left;
+      font-size: 16px;
+      margin-bottom: 20px;
+      padding: 10px 15px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .sidebar button:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar button i {
+      margin-right: 10px;
+      font-size: 18px;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 50px;
+      overflow-y: auto;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    .product-card {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 30px;
+    }
+
+    .product-card h3 {
+      margin-bottom: 20px;
+      font-size: 18px;
+      color: #fff;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+    }
+
+    .form-grid input,
+    .form-grid button {
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .form-grid input {
+      background-color: rgba(255,255,255,0.9);
+    }
+
+    .form-grid button {
+      background-color: #3498db;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .form-grid button:hover {
+      background-color: #2980b9;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 15px;
+      text-align: left;
+      color: #fff;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+
+    th {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    td img {
+      max-width: 60px;
+      border-radius: 8px;
+    }
+
+    .action-btn {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-right: 5px;
+    }
+
+    .edit-btn {
+      background-color: #ffc107;
+      color: #000;
+    }
+
+    .delete-btn {
+      background-color: #dc3545;
+      color: #fff;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        flex-direction: row;
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        justify-content: space-around;
+      }
+
+      .sidebar h3 {
+        display: none;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      th, td {
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <h3>Admin Panel</h3>
+    <button onclick="goTo('admin-dashboard.html')"><i class="bi bi-house"></i> Dashboard</button>
+    <button onclick="goTo('admin-products.html')"><i class="bi bi-box-seam"></i> Products</button>
+    <button onclick="goTo('admin-orders.html')"><i class="bi bi-receipt"></i> Orders</button>
+    <button onclick="goTo('admin-user.html')"><i class="bi bi-people"></i> Users</button>
+    <button onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</button>
+  </div>
+
+  <div class="main-content">
+    <h2><i class="bi bi-box-seam"></i> Manage Products</h2>
+
+    <div class="product-card">
+      <h3><i class="bi bi-plus-circle"></i> Add New Product</h3>
+      <div class="form-grid">
+        <input type="text" id="name" placeholder="Product Name" />
+        <input type="text" id="price" placeholder="Price ₹" />
+        <input type="text" id="description" placeholder="Description" />
+        <input type="file" id="imageFile" accept="image/*" />
+        <button onclick="addProduct()">Add Product</button>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Image</th>
+          <th>Name</th>
+          <th>Price</th>
+          <th>Description</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="productTableBody"></tbody>
+    </table>
+  </div>
+
+  <script>
+    if (localStorage.getItem("adminLoggedIn") !== "true") {
+      window.location.href = "admin-login.html";
+    }
+
+    function goTo(page) {
+      window.location.href = page;
+    }
+
+    function logout() {
+      localStorage.removeItem("adminLoggedIn");
+      window.location.href = "login.html";
+    }
+
+    let products = JSON.parse(localStorage.getItem("products")) || [];
+
+    function displayProducts() {
+      const tbody = document.getElementById("productTableBody");
+      tbody.innerHTML = "";
+
+      products.forEach((product, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td><img src="${product.image}" alt="Product Image"></td>
+          <td>${product.name}</td>
+          <td>₹${product.price}</td>
+          <td>${product.description}</td>
+          <td>
+            <button class="action-btn edit-btn" onclick="editProduct(${index})">Edit</button>
+            <button class="action-btn delete-btn" onclick="deleteProduct(${index})">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function addProduct() {
+      const name = document.getElementById("name").value.trim();
+      const price = document.getElementById("price").value.trim();
+      const description = document.getElementById("description").value.trim();
+      const imageInput = document.getElementById("imageFile");
+      const file = imageInput.files[0];
+
+      if (!name || !price || !description || !file) {
+        alert("Please fill in all fields and choose an image.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        const base64Image = event.target.result;
+        const newProduct = { name, price, description, image: base64Image };
+        products.push(newProduct);
+        localStorage.setItem("products", JSON.stringify(products));
+        displayProducts();
+
+        document.getElementById("name").value = "";
+        document.getElementById("price").value = "";
+        document.getElementById("description").value = "";
+        document.getElementById("imageFile").value = "";
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function deleteProduct(index) {
+      if (confirm("Are you sure you want to delete this product?")) {
+        products.splice(index, 1);
+        localStorage.setItem("products", JSON.stringify(products));
+        displayProducts();
+      }
+    }
+
+    function editProduct(index) {
+      const product = products[index];
+      document.getElementById("name").value = product.name;
+      document.getElementById("price").value = product.price;
+      document.getElementById("description").value = product.description;
+      deleteProduct(index); // remove old product so user can re-add after edit
+    }
+
+    displayProducts();
+  </script>
+</body>
+</html>

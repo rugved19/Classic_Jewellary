@@ -1,40 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Placed</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Order Placed</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+  />
+
+  <!-- EmailJS SDK -->
+  <script type="text/javascript" src="https://cdn.emailjs.com/dist/email.min.js"></script>
+  <script>
+    (function () {
+      emailjs.init("0mXnJzuDdnxnUGsam"); // ✅ Your EmailJS Public Key (User ID)
+    })();
+  </script>
 </head>
 <body>
 
-<div class="container text-center mt-5">
+  <div class="container text-center mt-5">
     <h2 class="text-success">✅ Order Placed Successfully!</h2>
     <p>Thank you for your purchase. Your order has been placed.</p>
-    <p class="text-muted">Redirecting to Order History in <span id="countdown">5</span> seconds...</p>
+    <p class="text-muted">
+      Redirecting to Order History in <span id="countdown">5</span> seconds...
+    </p>
     <a href="order-history.html" class="btn btn-primary">View Order History</a>
     <a href="product.html" class="btn btn-secondary">Continue Shopping</a>
-</div>
+  </div>
 
-<script>
-    let countdown = 5; // Start countdown from 5 seconds
+  <script>
+    // Countdown redirect
+    let countdown = 5;
     let timer = setInterval(function () {
-        countdown--;
-        document.getElementById("countdown").textContent = countdown;
-        if (countdown <= 0) {
-            clearInterval(timer);
-            window.location.href = "order-history.html"; // Redirect when countdown ends
-        }
+      countdown--;
+      document.getElementById("countdown").textContent = countdown;
+      if (countdown <= 0) {
+        clearInterval(timer);
+        window.location.href = "order-history.html";
+      }
     }, 1000);
-</script>
 
+    // Send Order Confirmation Email
+    function sendOrderConfirmationEmail(orderDetails) {
+      const emailParams = {
+        to_name: orderDetails.customer_name,
+        order_id: orderDetails.order_id,
+        message: orderDetails.total_amount,
+        address: orderDetails.shipping_address,
+        email: orderDetails.customer_email,
+        item_1: `${orderDetails.items[0].name} x${orderDetails.items[0].quantity} - ${orderDetails.items[0].price}`,
+        item_2: `${orderDetails.items[1].name} x${orderDetails.items[1].quantity} - ${orderDetails.items[1].price}`,
+        shipping: orderDetails.shipping_cost,
+        tax: orderDetails.tax_cost,
+        total: orderDetails.total_amount
+      };
+
+      emailjs
+        .send("service_ci4gduj", "template_5506ggc", emailParams) // ✅ Your service ID & template ID
+        .then(function (response) {
+          console.log("✅ Email sent successfully:", response);
+        })
+        .catch(function (error) {
+          console.error("❌ Email sending failed:", error);
+        });
+    }
+
+    // Example order data (replace with dynamic values)
+    const orderDetails = {
+      customer_name: "John Doe",
+      order_id: "CJ12345",
+      total_amount: "₹2000",
+      shipping_address: "123, Example Street, City, State",
+      customer_email: "customer@example.com",
+      items: [
+        {
+          name: "Gold Necklace",
+          quantity: 1,
+          price: "₹1000"
+        },
+        {
+          name: "Silver Ring",
+          quantity: 1,
+          price: "₹1000"
+        }
+      ],
+      shipping_cost: "₹100",
+      tax_cost: "₹50"
+    };
+
+    // Trigger email
+    sendOrderConfirmationEmail(orderDetails);
+  </script>
 </body>
 </html>
-
-
-
-
-
-
-

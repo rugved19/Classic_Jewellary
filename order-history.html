@@ -1,107 +1,218 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order History</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .card {
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .order-address {
-            background: #eef4ff;
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-        .delete-order {
-            font-size: 12px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Order History</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.21/jspdf.plugin.autotable.min.js"></script>
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .card {
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .order-address {
+      background: #eef4ff;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    .btn-small {
+      font-size: 12px;
+      margin-right: 5px;
+    }
+    .invoice-footer {
+      font-size: 10px;
+      color: #888;
+      text-align: center;
+      margin-top: 20px;
+    }
+    .order-status {
+      font-weight: bold;
+    }
+    .status-pending {
+      color: orange;
+    }
+    .status-shipped {
+      color: blue;
+    }
+    .status-delivered {
+      color: green;
+    }
+    .status-completed {
+      color: #28a745;
+    }
+  </style>
 </head>
 <body>
 
-<!-- Order History Section -->
 <div class="container mt-5">
-    <h2 class="mb-3">📜 Order History</h2>
-    <p id="userInfo" class="text-muted"></p>
-    <ul id="orderHistory" class="list-group"></ul>
-
-    <!-- Back to Products Button -->
-    <a href="product.html" class="btn btn-secondary mt-3">← Back to Products</a>
+  <h2 class="mb-3">📜 Order History</h2>
+  <p id="userInfo" class="text-muted"></p>
+  <ul id="orderHistory" class="list-group"></ul>
+  <a href="product.html" class="btn btn-secondary mt-3">← Back to Products</a>
 </div>
 
 <script>
-    $(document).ready(function () {
-        let userName = localStorage.getItem("currentUser"); // Get logged-in user
-        let orderHistory = $("#orderHistory");
-        let userInfo = $("#userInfo");
+  $(document).ready(function () {
+    let userName = localStorage.getItem("currentUser");
+    let orderHistory = $("#orderHistory");
+    let userInfo = $("#userInfo");
 
-        if (!userName) {
-            userInfo.text("⚠ No user found. Please log in first.");
-            orderHistory.append("<li class='list-group-item text-center'>No orders found.</li>");
-            return;
-        }
+    if (!userName) {
+      userInfo.text("⚠ No user found. Please log in first.");
+      orderHistory.append("<li class='list-group-item text-center'>No orders found.</li>");
+      return;
+    }
 
-        let orders = JSON.parse(localStorage.getItem(`orders_${userName}`)) || [];
-        let userAddress = JSON.parse(localStorage.getItem(`address_${userName}`)); // Fetch specific user address
+    let orders = JSON.parse(localStorage.getItem(`orders_${userName}`)) || [];
+    let userAddress = JSON.parse(localStorage.getItem(`address_${userName}`));
 
-        userInfo.html(`Showing order history for: <strong>${userName}</strong>`);
+    userInfo.html(`Showing order history for: <strong>${userName}</strong>`);
 
-        function displayOrders() {
-            orderHistory.empty(); // Clear list before re-rendering
+    function getStatusClass(status) {
+      switch (status.toLowerCase()) {
+        case "pending": return "status-pending";
+        case "shipped": return "status-shipped";
+        case "delivered": return "status-delivered";
+        case "completed": return "status-completed";
+        default: return "status-pending";
+      }
+    }
 
-            if (orders.length === 0) {
-                orderHistory.append("<li class='list-group-item text-center'>No orders yet.</li>");
-            } else {
-                orders.slice().reverse().forEach((order, index) => {  // Reverse order to show latest first
-                    let items = order.items.map(item => `${item.name} - ₹${item.price}`).join("<br>");
-                    let totalAmount = order.items.reduce((sum, item) => sum + item.price, 0);
+    function displayOrders() {
+      orderHistory.empty();
 
-                    let paymentInfo = order.paymentMethod === "razorpay" 
-                        ? `✅ <strong>Online Payment (Razorpay)</strong> <br> Payment ID: ${order.paymentDetails}`
-                        : `💰 <strong>Cash on Delivery (COD)</strong>`;
+      if (orders.length === 0) {
+        orderHistory.append("<li class='list-group-item text-center'>No orders yet.</li>");
+        return;
+      }
 
-                    let addressHTML = userAddress
-                        ? `<div class="order-address">
-                            <strong>Delivery Address:</strong><br>
-                            🏠 ${userAddress.flat}, ${userAddress.area} <br>
-                            📍 ${userAddress.landmark || "No landmark"} <br>
-                            📞 ${userAddress.mobile}
-                           </div>`
-                        : `<div class="text-danger">❌ Address Not Found</div>`;
+      orders.slice().reverse().forEach((order, index) => {
+        let items = order.items.map(item =>
+          `<tr><td>${item.name}</td><td>₹${item.price}</td></tr>`
+        ).join("");
+        let totalAmount = order.items.reduce((sum, item) => sum + item.price, 0);
 
-                    orderHistory.append(`
-                        <li class="list-group-item mb-4 card p-3">
-                            <h5>Order #${orders.length - index} (${order.date})</h5>
-                            <p>${items}</p>
-                            <hr>
-                            <strong>Total: ₹${totalAmount}</strong><br>
-                            ${paymentInfo}
-                            ${addressHTML}
-                            <button class="btn btn-danger btn-sm float-end delete-order mt-2" data-index="${orders.length - index - 1}">🗑 Delete</button>
-                        </li>
-                    `);
-                });
-            }
-        }
+        let paymentInfo = order.paymentMethod === "razorpay"
+          ? `✅ <strong>Online Payment (Razorpay)</strong> <br> Payment ID: ${order.paymentDetails}`
+          : `💰 <strong>Cash on Delivery (COD)</strong>`;
 
-        displayOrders(); // Load order history on page load
+        let addressHTML = userAddress
+          ? `<div class="order-address">
+              <strong>Delivery Address:</strong><br>
+              🏠 ${userAddress.flat}, ${userAddress.area} <br>
+              📍 ${userAddress.landmark || "No landmark"} <br>
+              📞 ${userAddress.mobile}
+            </div>`
+          : `<div class="text-danger">❌ Address Not Found</div>`;
 
-        // Delete Order
-        $(document).on("click", ".delete-order", function () {
-            let index = $(this).data("index");
-            orders.splice(index, 1); // Remove the order from array
-            localStorage.setItem(`orders_${userName}`, JSON.stringify(orders)); // Update localStorage
-            displayOrders(); // Refresh order list
-        });
+        let orderStatus = order.status || "Pending";
+        let statusClass = getStatusClass(orderStatus);
+
+        orderHistory.append(`
+          <li class="list-group-item mb-4 card p-3">
+            <h5>Order #${orders.length - index} (${order.date})</h5>
+            <div class="table-responsive">
+              <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                  <tr><th>Item</th><th>Price</th></tr>
+                </thead>
+                <tbody>${items}</tbody>
+              </table>
+            </div>
+            <strong>Total: ₹${totalAmount}</strong><br>
+            ${paymentInfo}
+            ${addressHTML}
+            <p class="order-status ${statusClass}">Status: ${orderStatus}</p>
+            <button class="btn btn-danger btn-small delete-order mt-2" data-index="${orders.length - index - 1}">🗑 Delete</button>
+            <button class="btn btn-primary btn-small download-invoice mt-2" data-index="${orders.length - index - 1}">📄 Download Invoice</button>
+          </li>
+        `);
+      });
+    }
+
+    displayOrders();
+
+    // Delete Order
+    $(document).on("click", ".delete-order", function () {
+      let index = $(this).data("index");
+      orders.splice(index, 1);
+      localStorage.setItem(`orders_${userName}`, JSON.stringify(orders));
+      displayOrders();
     });
+
+    // Download Invoice
+    $(document).on("click", ".download-invoice", function () {
+      const index = $(this).data("index");
+      const order = orders[index];
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      let y = 20;
+
+      doc.setFontSize(16);
+      doc.text("Classic Jewellery - Invoice", 10, y);
+      y += 10;
+
+      doc.setFontSize(12);
+      doc.text(`Customer: ${userName}`, 10, y);
+      y += 6;
+      doc.text(`Order Date: ${order.date}`, 10, y);
+      y += 10;
+
+      doc.setFontSize(14);
+      doc.text("Order Details:", 10, y);
+      y += 6;
+
+      doc.autoTable({
+        startY: y,
+        head: [['Item', 'Price']],
+        body: order.items.map(item => [item.name, `₹${item.price.toFixed(2)}`]),
+        theme: 'grid',
+        margin: { top: 10 },
+        styles: { fontSize: 10, cellPadding: 3 },
+        didDrawPage: function (data) {
+          y = data.cursor.y + 10;
+        }
+      });
+
+      doc.setFontSize(12);
+      doc.text(`Total Amount: ₹${order.items.reduce((sum, item) => sum + item.price, 0).toFixed(2)}`, 10, y); y += 8;
+      doc.text(`Payment Method: ${order.paymentMethod === 'razorpay' ? 'Online (Razorpay)' : 'Cash on Delivery'}`, 10, y); y += 6;
+
+      if (order.paymentMethod === 'razorpay') {
+        doc.text(`Payment ID: ${order.paymentDetails}`, 10, y); y += 6;
+      }
+
+      doc.setFontSize(14);
+      doc.text("Delivery Address:", 10, y); y += 6;
+      doc.setFontSize(12);
+
+      if (userAddress) {
+        doc.text(`Flat: ${userAddress.flat}`, 10, y); y += 5;
+        doc.text(`Area: ${userAddress.area}`, 10, y); y += 5;
+        doc.text(`Landmark: ${userAddress.landmark || 'N/A'}`, 10, y); y += 5;
+        doc.text(`Mobile: ${userAddress.mobile}`, 10, y); y += 8;
+      } else {
+        doc.text("❌ Address Not Found", 10, y); y += 8;
+      }
+
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(10);
+        doc.setTextColor(150);
+        doc.text("Classic Jewellery • www.classicjewels.com • support@classicjewels.com", 10, 290);
+      }
+
+      doc.save(`Invoice_Order_${index + 1}.pdf`);
+    });
+  });
 </script>
 
 </body>
